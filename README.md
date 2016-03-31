@@ -1,4 +1,6 @@
 # イカナカマiOS通話テスト用アプリ
+SkyWayの登録 (API KEYを発行 / 使用するドメイン or IPアドレスの登録)  
+https://nttcom.github.io/skyway/index.html  
 公式SDK  
 https://github.com/nttcom/SkyWay-iOS-SDK  
 公式サンプルアプリ  
