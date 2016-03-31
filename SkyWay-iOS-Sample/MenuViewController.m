@@ -25,8 +25,8 @@ typedef NS_ENUM(NSUInteger, ViewTag)
 	// Do any additional setup after loading the view.
 	
     [self.view setBackgroundColor:[UIColor whiteColor]];
-    
-	[self setTitle:@"Menu"];
+
+	[self setTitle:@""];
 	
 	//
 	CGRect rcClient = self.view.bounds;
@@ -55,7 +55,8 @@ typedef NS_ENUM(NSUInteger, ViewTag)
 	[btnVideoChat setBackgroundColor:[UIColor lightGrayColor]];
 	[btnVideoChat setFrame:rcVideoChat];
 	[btnVideoChat addTarget:self action:@selector(touchUpInside:) forControlEvents:UIControlEventTouchUpInside];
-	
+    [btnVideoChat setHidden:YES];
+
 	[self.view addSubview:btnVideoChat];
 	
 	// Chat
@@ -72,12 +73,28 @@ typedef NS_ENUM(NSUInteger, ViewTag)
 	[btnChat setBackgroundColor:[UIColor lightGrayColor]];
 	[btnChat setFrame:rcChat];
 	[btnChat addTarget:self action:@selector(touchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [btnChat setHidden:YES];
 	
 	[self.view addSubview:btnChat];
 	
 
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+
+    UIViewController* vc = nil;
+
+    // Video chat
+    MediaConnectionViewController* vcVideoChat = [[MediaConnectionViewController alloc] initWithNibName:nil bundle:[NSBundle mainBundle]];
+    NSString* strTitle = @"MediaConnection";
+    [vcVideoChat.navigationItem setTitle:strTitle];
+    
+    vc = vcVideoChat;
+
+    [self.navigationController pushViewController:vc animated:YES];
+}
 
 - (void)didReceiveMemoryWarning
 {

@@ -1,3 +1,10 @@
+# イカナカマiOS通話テスト用アプリ
+公式SDK  
+https://github.com/nttcom/SkyWay-iOS-SDK  
+公式サンプルアプリ  
+https://github.com/nttcom/SkyWay-iOS-Sample  
+以下は公式サンプルアプリのREADME
+
 # SkyWay iOS Sample
 Sample application of SkyWayiOSSDK
 

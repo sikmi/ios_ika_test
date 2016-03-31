@@ -15,16 +15,23 @@
 
 // Enter your APIkey and Domain
 // Please check this page. >> https://skyway.io/ds/
-static NSString *const kAPIkey = @"yourAPIKEY";
-static NSString *const kDomain = @"yourDomain";
+static NSString *const kAPIkey = @"4f2c9f8d-00a7-4619-b74a-22111eed772c";
+static NSString *const kDomain = @"160.16.206.27";   // サーバのIP or ドメイン
+static NSString *const kPeerID = @"skywayTEST";
 
 
 typedef NS_ENUM(NSUInteger, ViewTag)
 {
 	TAG_ID = 1000,
 	TAG_WEBRTC_ACTION,
-	TAG_REMOTE_VIDEO,
 	TAG_LOCAL_VIDEO,
+    TAG_REMOTE_VIDEO,
+	TAG_REMOTE_VIDEO2,
+	TAG_REMOTE_VIDEO3,
+	TAG_REMOTE_VIDEO4,
+	TAG_REMOTE_VIDEO5,
+	TAG_REMOTE_VIDEO6,
+	TAG_REMOTE_VIDEO7,
 };
 
 typedef NS_ENUM(NSUInteger, AlertType)
@@ -39,11 +46,17 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	SKWPeer*			_peer;
 	SKWMediaStream*		_msLocal;
 	SKWMediaStream*		_msRemote;
-	SKWMediaConnection*	_mediaConnection;
-	
+	SKWMediaStream*		_msRemote2;
+    SKWMediaStream*		_msRemote3;
+    SKWMediaStream*		_msRemote4;
+    SKWMediaStream*		_msRemote5;
+    SKWMediaStream*		_msRemote6;
+    SKWMediaStream*		_msRemote7;
+    SKWMediaConnection*	_mediaConnection;
+
 	NSString*			_strOwnId;
-	BOOL				_bConnected;
-	
+	//BOOL				_bConnected;
+	NSInteger           _bConnected;
 }
 
 @end
@@ -62,7 +75,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	// Initialize
 	//
 	_strOwnId = nil;
-	_bConnected = NO;
+	_bConnected = 0;
 	
 	[self.view setBackgroundColor:[UIColor whiteColor]];
 	
@@ -83,7 +96,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
     // SKWPeer has many options. Please check the document. >> http://nttcom.github.io/skyway/docs/
     
     
-    _peer	= [[SKWPeer alloc] initWithId:nil options:option];
+    _peer	= [[SKWPeer alloc] initWithId:kPeerID options:option];
     [self setCallbacks:_peer];
     
     //////////////////////////////////////////////////////////////////////
@@ -104,7 +117,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	constraints.maxHeight = 540;
     //	constraints.cameraPosition = SKW_CAMERA_POSITION_BACK;
     constraints.cameraPosition = SKW_CAMERA_POSITION_FRONT;
-    
+
 	_msLocal = [SKWNavigator getUserMedia:constraints];
     
     //////////////////////////////////////////////////////////////////////
@@ -119,7 +132,12 @@ typedef NS_ENUM(NSUInteger, AlertType)
 		NSString* strTitle = @"MediaConnection";
 		[self.navigationItem setTitle:strTitle];
 	}
-	
+
+    if (nil != self.navigationItem)
+    {
+        [self.navigationItem setHidesBackButton:YES];
+    }
+
 	CGRect rcScreen = self.view.bounds;
 	if (NSFoundationVersionNumber_iOS_6_1 < NSFoundationVersionNumber)
 	{
@@ -137,23 +155,37 @@ typedef NS_ENUM(NSUInteger, AlertType)
 
 	// Initialize Remote video view
     CGRect rcRemote = CGRectZero;
-    if (UIUserInterfaceIdiomPad == [UIDevice currentDevice].userInterfaceIdiom)
-    {
-        // iPad
-        rcRemote.size.width = 480.0f;
-        rcRemote.size.height = 480.0f;
+    rcRemote.size.width = 140.0f;
+    rcRemote.size.height = rcRemote.size.width;
+    rcRemote.origin.x = 15.0f;
+    if (nil != self.navigationController) {
+        CGRect rcTitle = self.navigationController.navigationBar.frame;
+        rcRemote.origin.y = rcTitle.origin.y + rcTitle.size.height;
+    } else {
+        rcRemote.origin.y = 100.0f;
     }
-    else
-    {
-        // iPhone / iPod touch
-        rcRemote.size.width = rcScreen.size.width;
-        rcRemote.size.height = rcRemote.size.width;
-    }
-    rcRemote.origin.x = (rcScreen.size.width - rcRemote.size.width) / 2.0f;
-    rcRemote.origin.y = (rcScreen.size.height - rcRemote.size.height) / 2.0f;
-    rcRemote.origin.y -= 8.0f;
+
+    CGRect rcRemote2 = rcRemote;
+    rcRemote2.origin.x += 150.0f;
+
+    CGRect rcRemote3 = rcRemote;
+    rcRemote3.origin.y += 120.0f;
+
+    CGRect rcRemote4 = rcRemote;
+    rcRemote4.origin.x += 150.0f;
+    rcRemote4.origin.y += 120.0f;
     
-    
+    CGRect rcRemote5 = rcRemote;
+    rcRemote5.origin.y += 240.0f;
+
+    CGRect rcRemote6 = rcRemote;
+    rcRemote6.origin.x += 150.0f;
+    rcRemote6.origin.y += 240.0f;
+
+    CGRect rcRemote7 = rcRemote;
+    rcRemote7.origin.x += 75.0f;
+    rcRemote7.origin.y += 360.0f;
+
     // Initialize Local video view
     CGRect rcLocal = CGRectZero;
     if (UIUserInterfaceIdiomPad == [UIDevice currentDevice].userInterfaceIdiom)
@@ -181,8 +213,43 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	[vwRemote setUserInteractionEnabled:NO];
 	[vwRemote setHidden:YES];
 	[self.view addSubview:vwRemote];
-	
-    
+
+    SKWVideo* vwRemote2 = [[SKWVideo alloc] initWithFrame:rcRemote2];
+    [vwRemote2 setTag:TAG_REMOTE_VIDEO2];
+    [vwRemote2 setUserInteractionEnabled:NO];
+    [vwRemote2 setHidden:YES];
+    [self.view addSubview:vwRemote2];
+
+    SKWVideo* vwRemote3 = [[SKWVideo alloc] initWithFrame:rcRemote3];
+    [vwRemote3 setTag:TAG_REMOTE_VIDEO3];
+    [vwRemote3 setUserInteractionEnabled:NO];
+    [vwRemote3 setHidden:YES];
+    [self.view addSubview:vwRemote3];
+
+    SKWVideo* vwRemote4 = [[SKWVideo alloc] initWithFrame:rcRemote4];
+    [vwRemote4 setTag:TAG_REMOTE_VIDEO4];
+    [vwRemote4 setUserInteractionEnabled:NO];
+    [vwRemote4 setHidden:YES];
+    [self.view addSubview:vwRemote4];
+
+    SKWVideo* vwRemote5 = [[SKWVideo alloc] initWithFrame:rcRemote5];
+    [vwRemote5 setTag:TAG_REMOTE_VIDEO5];
+    [vwRemote5 setUserInteractionEnabled:NO];
+    [vwRemote5 setHidden:YES];
+    [self.view addSubview:vwRemote5];
+
+    SKWVideo* vwRemote6 = [[SKWVideo alloc] initWithFrame:rcRemote6];
+    [vwRemote6 setTag:TAG_REMOTE_VIDEO6];
+    [vwRemote6 setUserInteractionEnabled:NO];
+    [vwRemote6 setHidden:YES];
+    [self.view addSubview:vwRemote6];
+
+    SKWVideo* vwRemote7 = [[SKWVideo alloc] initWithFrame:rcRemote7];
+    [vwRemote7 setTag:TAG_REMOTE_VIDEO7];
+    [vwRemote7 setUserInteractionEnabled:NO];
+    [vwRemote7 setHidden:YES];
+    [self.view addSubview:vwRemote7];
+
 	SKWVideo* vwLocal = [[SKWVideo alloc] initWithFrame:rcLocal];
 	[vwLocal setTag:TAG_LOCAL_VIDEO];
 	[self.view addSubview:vwLocal];
@@ -208,6 +275,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
     lblId.numberOfLines = 2;
     [lblId setText:@"your ID:\n ---"];
     [lblId setBackgroundColor:[UIColor whiteColor]];
+    [lblId setHidden:YES];
 	
 	[self.view addSubview:lblId];
 	
@@ -222,6 +290,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	[btnCall setTitle:@"Call to" forState:UIControlStateNormal];
 	[btnCall setBackgroundColor:[UIColor lightGrayColor]];
 	[btnCall addTarget:self action:@selector(onTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [btnCall setHidden:YES];
 
 	[self.view addSubview:btnCall];
     
@@ -233,7 +302,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
     
     UIButton* btnChange = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [btnChange setFrame:rcChange];
-    [btnChange setTitle:@"Change Camera" forState:UIControlStateNormal];
+    [btnChange setTitle:@"Change Local Camera" forState:UIControlStateNormal];
     [btnChange setBackgroundColor:[UIColor whiteColor]];
     [btnChange addTarget:self action:@selector(cycleLocalCamera) forControlEvents:UIControlEventTouchUpInside];
     
@@ -263,9 +332,15 @@ typedef NS_ENUM(NSUInteger, AlertType)
 {
     _msLocal = nil;
 	_msRemote = nil;
-	
+	_msRemote2 = nil;
+    _msRemote3 = nil;
+    _msRemote4 = nil;
+    _msRemote5 = nil;
+    _msRemote6 = nil;
+    _msRemote7 = nil;
+
 	_strOwnId = nil;
-	
+
 	_mediaConnection = nil;
 	_peer = nil;
 }
@@ -306,22 +381,94 @@ typedef NS_ENUM(NSUInteger, AlertType)
 			{
 				[video removeSrc:_msRemote track:0];
 			}
-			
+
 			[_msRemote close];
-			
+
 			_msRemote = nil;
 		}
-		
-		[_mediaConnection close];
+        if (nil != _msRemote2)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO2];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote2 track:0];
+            }
+
+            [_msRemote2 close];
+
+            _msRemote2 = nil;
+        }
+        if (nil != _msRemote3)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO3];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote3 track:0];
+            }
+            
+            [_msRemote3 close];
+            
+            _msRemote3 = nil;
+        }
+        if (nil != _msRemote4)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO4];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote4 track:0];
+            }
+            
+            [_msRemote4 close];
+            
+            _msRemote4 = nil;
+        }
+        if (nil != _msRemote5)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO5];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote5 track:0];
+            }
+            
+            [_msRemote5 close];
+            
+            _msRemote5 = nil;
+        }
+        if (nil != _msRemote6)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO6];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote6 track:0];
+            }
+            
+            [_msRemote6 close];
+            
+            _msRemote6 = nil;
+        }
+        if (nil != _msRemote7)
+        {
+            SKWVideo* video = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO7];
+            if (nil != video)
+            {
+                [video removeSrc:_msRemote7 track:0];
+            }
+            
+            [_msRemote7 close];
+            
+            _msRemote7 = nil;
+        }
+
+        [_mediaConnection close];
 	}
 }
 
 - (void)closedMedia
 {
 	[self unsetRemoteView];
-	
+
 	[self clearMediaCallbacks:_mediaConnection];
-	
+
 	_mediaConnection = nil;
 }
 
@@ -333,11 +480,11 @@ typedef NS_ENUM(NSUInteger, AlertType)
 	{
 		return;
 	}
-	
+
     //////////////////////////////////////////////////////////////////////////////////
     ///////////////////// START: Set SkyWay peer callback   //////////////////////////
     //////////////////////////////////////////////////////////////////////////////////
-    
+
 	// !!!: Event/Open
 	[peer on:SKW_PEER_EVENT_OPEN callback:^(NSObject* obj)
 	 {
@@ -362,7 +509,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
 							}
 						});
 	 }];
-	
+
 	// !!!: Event/Call
 	[peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* obj)
 	 {
@@ -374,22 +521,22 @@ typedef NS_ENUM(NSUInteger, AlertType)
              [_mediaConnection answer:_msLocal];
 		 }
 	 }];
-	
+
 	// !!!: Event/Close
 	[peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj)
 	 {
 	 }];
-	
+
 	// !!!: Event/Disconnected
 	[peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj)
 	 {
 	 }];
-	
+
 	// !!!: Event/Error
 	[peer on:SKW_PEER_EVENT_ERROR callback:^(NSObject* obj)
 	 { 
 	 }];
-    
+
     //////////////////////////////////////////////////////////////////////////////////
     /////////////////////// END: Set SkyWay peer callback   //////////////////////////
     //////////////////////////////////////////////////////////////////////////////////
@@ -531,63 +678,226 @@ typedef NS_ENUM(NSUInteger, AlertType)
 
 - (void)setRemoteView:(SKWMediaStream *)stream
 {
-	
-	if (YES == _bConnected)
-	{
+	if (_bConnected >= 7) {
 		return;
 	}
-	
-	_bConnected = YES;
-	
-	_msRemote = stream;
-	
-	[self updateActionButtonTitle];
-	
-	dispatch_async(dispatch_get_main_queue(), ^
-				   {
-					   SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO];
-					   if (nil != vwRemote)
-					   {
-						   [vwRemote setHidden:NO];
-						   [vwRemote setUserInteractionEnabled:YES];
-						   
-						   [vwRemote addSrc:_msRemote track:0];
-					   }
-				   });
+
+	_bConnected += 1;
+
+    if (_bConnected == 1) {
+        _msRemote = stream;
+
+        [self updateActionButtonTitle];
+
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+
+                               [vwRemote addSrc:_msRemote track:0];
+                           }
+                       });
+    } else if (_bConnected == 2) {
+        _msRemote2 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO2];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+
+                               [vwRemote addSrc:_msRemote2 track:0];
+                           }
+                       });
+    } else if (_bConnected == 3) {
+        _msRemote3 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO3];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+                               
+                               [vwRemote addSrc:_msRemote3 track:0];
+                           }
+                       });
+    } else if (_bConnected == 4) {
+        _msRemote4 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO4];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+                               
+                               [vwRemote addSrc:_msRemote4 track:0];
+                           }
+                       });
+    } else if (_bConnected == 5) {
+        _msRemote5 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO5];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+                               
+                               [vwRemote addSrc:_msRemote5 track:0];
+                           }
+                       });
+    } else if (_bConnected == 6) {
+        _msRemote6 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO6];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+                               
+                               [vwRemote addSrc:_msRemote6 track:0];
+                           }
+                       });
+    } else if (_bConnected == 7) {
+        _msRemote7 = stream;
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO7];
+                           if (nil != vwRemote)
+                           {
+                               [vwRemote setHidden:NO];
+                               [vwRemote setUserInteractionEnabled:YES];
+                               
+                               [vwRemote addSrc:_msRemote7 track:0];
+                           }
+                       });
+    }
 }
 
 - (void)unsetRemoteView
 {
-	if (NO == _bConnected)
+	if (0 == _bConnected)
 	{
 		return;
 	}
 	
-	_bConnected = NO;
+	_bConnected = 0;
 	
 	SKWVideo* vwRemote = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO];
-	
-	if (nil != _msRemote)
-	{
-		if (nil != vwRemote)
-		{
+	SKWVideo* vwRemote2 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO2];
+    SKWVideo* vwRemote3 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO3];
+    SKWVideo* vwRemote4 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO4];
+    SKWVideo* vwRemote5 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO5];
+    SKWVideo* vwRemote6 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO4];
+    SKWVideo* vwRemote7 = (SKWVideo *)[self.view viewWithTag:TAG_REMOTE_VIDEO5];
+
+	if (nil != _msRemote) {
+		if (nil != vwRemote) {
 			[vwRemote removeSrc:_msRemote track:0];
 		}
-		
 		[_msRemote close];
-		
 		_msRemote = nil;
 	}
-	
-	if (nil != vwRemote)
-	{
+    if (nil != _msRemote2) {
+        if (nil != vwRemote2){
+            [vwRemote2 removeSrc:_msRemote2 track:0];
+        }
+        [_msRemote2 close];
+        _msRemote2 = nil;
+    }
+    if (nil != _msRemote3) {
+        if (nil != vwRemote3) {
+            [vwRemote3 removeSrc:_msRemote3 track:0];
+        }
+        [_msRemote3 close];
+        _msRemote3 = nil;
+    }
+    if (nil != _msRemote4) {
+        if (nil != vwRemote4) {
+            [vwRemote4 removeSrc:_msRemote4 track:0];
+        }
+        [_msRemote4 close];
+        _msRemote4 = nil;
+    }
+    if (nil != _msRemote5) {
+        if (nil != vwRemote5) {
+            [vwRemote5 removeSrc:_msRemote5 track:0];
+        }
+        [_msRemote5 close];
+        _msRemote5 = nil;
+    }
+    if (nil != _msRemote6) {
+        if (nil != vwRemote6) {
+            [vwRemote6 removeSrc:_msRemote6 track:0];
+        }
+        [_msRemote6 close];
+        _msRemote6 = nil;
+    }
+    if (nil != _msRemote7) {
+        if (nil != vwRemote7) {
+            [vwRemote7 removeSrc:_msRemote7 track:0];
+        }
+        [_msRemote7 close];
+        _msRemote7 = nil;
+    }
+
+	if (nil != vwRemote) {
 		dispatch_async(dispatch_get_main_queue(), ^
 					   {
 						   [vwRemote setUserInteractionEnabled:NO];
 						   [vwRemote setHidden:YES];
 					   });
 	}
-	
+    if (nil != vwRemote2) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote2 setUserInteractionEnabled:NO];
+                           [vwRemote2 setHidden:YES];
+                       });
+    }
+    if (nil != vwRemote3) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote3 setUserInteractionEnabled:NO];
+                           [vwRemote3 setHidden:YES];
+                       });
+    }
+    if (nil != vwRemote4) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote4 setUserInteractionEnabled:NO];
+                           [vwRemote4 setHidden:YES];
+                       });
+    }
+    if (nil != vwRemote5) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote5 setUserInteractionEnabled:NO];
+                           [vwRemote5 setHidden:YES];
+                       });
+    }
+    if (nil != vwRemote6) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote6 setUserInteractionEnabled:NO];
+                           [vwRemote6 setHidden:YES];
+                       });
+    }
+    if (nil != vwRemote7) {
+        dispatch_async(dispatch_get_main_queue(), ^
+                       {
+                           [vwRemote7 setUserInteractionEnabled:NO];
+                           [vwRemote7 setHidden:YES];
+                       });
+    }
+
 	[self updateActionButtonTitle];
 }
 
@@ -599,7 +909,7 @@ typedef NS_ENUM(NSUInteger, AlertType)
 		   
 		   NSString* strTitle = @"---";
 		   
-		   if (NO == _bConnected)
+		   if (0 == _bConnected)
 		   {
 			   strTitle = @"Call to";
 		   }
