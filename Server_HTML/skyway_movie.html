@@ -1,0 +1,74 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+<title>WebRTC TEST</title>
+<script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+<script src="https://skyway.io/dist/0.3/peer.min.js"></script>
+
+<script>
+  var API_KEY = '4f2c9f8d-00a7-4619-b74a-22111eed772c';
+  var REMOTE_PEER_ID = 'skywayTEST';
+  var media_stream = null;
+
+  $(function() {
+    var peer_id = create_peer_id();
+    $("#peerid_area").text("こちらのpeer ID = " + peer_id);
+
+    get_media_stream();
+
+    $("#test_btn").click( function() {
+      if (media_stream != null) {
+        var peer = init_skyway(peer_id);
+      } else {
+        alert('video 使用不可');
+      }
+    });
+  });
+
+  function create_peer_id() {
+    return Math.random().toString(36).slice(-8);
+  }
+
+  function get_media_stream() {
+    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+    navigator.getUserMedia(
+      { video: true, audio: true },
+      function(localMediaStream) {
+        media_stream = localMediaStream;
+      },
+      function(err) {
+        alert('video 取得失敗');
+      }
+    );
+  }
+
+  function init_skyway(peer_id) {
+    var peer = new Peer(peer_id, {key: API_KEY});
+
+    // PeerServerへの接続が確立
+    peer.on('open', function(id) {
+      console.log('peer open', ' peer id: ' + id);
+      // リモートのPeerへ接続
+      peer.call(REMOTE_PEER_ID, media_stream);
+    });
+
+    // リモートのpeerから着信
+    peer.on('call', function(mediaConnection) {
+      console.log('peer call');
+    });
+
+    return peer;
+  }
+</script>
+</head>
+
+<body>
+  WebRTC TEST
+  <br><br>
+  <div id="peerid_area">
+    こちらのpeer ID =
+  </div>
+  <br>
+  <input id="test_btn" type="button" value="WebRTC接続開始" />
+</body>
+</html>
